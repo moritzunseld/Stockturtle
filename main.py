@@ -2,78 +2,47 @@ import random
 from IPython.display import display
 import chess
 import chess.svg
-
-board = chess.Board()
-
-# "r" = random, "t" = take
-mode = "t"
+import Environment as e
+from PlayerRandom import PlayerRandom
+from PlayerTaking import PlayerTaking
 
 
-def calculate_score(color):
-    score = 0
-    for i in range(0, 64):
-        piece = board.piece_at(chess.SQUARES[i])
-        if piece is not None:
-            if piece.color == color:
-                if piece.piece_type == chess.PAWN:
-                    score += 1
-                elif piece.piece_type == chess.KNIGHT:
-                    score += 3
-                elif piece.piece_type == chess.BISHOP:
-                    score += 3
-                elif piece.piece_type == chess.ROOK:
-                    score += 5
-                elif piece.piece_type == chess.QUEEN:
-                    score += 9
-    return score
-
-
-def choose_taking_move(color, moves):
-    score = 0
-    best_score = calculate_score(not color)
-    best_move = random.choice(moves)
-    for move in moves:
-        board.push_san(str(move))
-        score = calculate_score(not color)
-        if score < best_score:
-            best_score = score
-            best_move = move
-        board.pop()
-    return best_move
-
-
-if mode == "r":
-    for i in range(1, 1000):
-        print("This is move", i)
-        print("There are", board.legal_moves.count(), "legal moves.")
-        board.push_san(str(random.choice(list(board.legal_moves))))
-
-        # For Jupyter
-        # display(chess.svg.board(board, size=350))
-        # For Pycharm
-        print(calculate_score(board.turn))
-        print(board)
-
-if mode == "t":
+def play_a_thousand_games(player1, player2):
     whiteWins, blackWins, remis = 0, 0, 0
-    for i in range(1, 1000):
-        if board.outcome() is None:
-            print("This is move", i)
-            print("There are", board.legal_moves.count(), "legal moves.")
-            board.push_san(str(choose_taking_move(board.turn, list(board.legal_moves))))
-        elif board.outcome().winner == chess.WHITE:
-            whiteWins += 1
-            break
-        elif board.outcome().winner == chess.BLACK:
-            blackWins += 1
-            break
-        else:
-            remis += 1
-            break
+    moves = 0
+    for j in range(0, 1000):
+        for i in range(1, 10000):
+            if e.board.outcome() is None:
+                if e.board.turn == chess.WHITE:
+                    e.board.push_san(player1.move(e.board.turn, list(e.board.legal_moves)))
+                    moves += 1
+                else:
+                    e.board.push_san(player2.move(e.board.turn, list(e.board.legal_moves)))
+                    moves += 1
+            elif e.board.outcome().winner == chess.WHITE:
+                whiteWins += 1
+                # print("White won after", i, "moves")
+                e.board.reset()
+                break
+            elif e.board.outcome().winner == chess.BLACK:
+                blackWins += 1
+                # print("Black won after", i, "moves")
+                e.board.reset()
+                break
+            else:
+                remis += 1
+                # print("Remis after", i, "moves")
+                e.board.reset()
+                break
 
-        # For Jupyter
-        # display(chess.svg.board(board, size=350))
-        # For Pycharm
-        # print(calculate_score(board.turn))
-        print(board)
-    print(whiteWins, blackWins, remis)
+            # For Jupyter
+            # display(chess.svg.board(board, size=350))
+            # For Pycharm
+            # print(calculate_score(board.turn))
+            # print(e.board)
+            # print("\n")
+        print(whiteWins, blackWins, remis)
+        print(moves / (whiteWins + blackWins + remis))
+
+
+play_a_thousand_games(PlayerRandom(), PlayerTaking())
