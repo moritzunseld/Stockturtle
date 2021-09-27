@@ -5,6 +5,9 @@ import chess
 import chess.svg
 import Environment as e
 import chess.pgn
+
+from PlayerHuman import PlayerHuman
+from PlayerMinMaxValueOnly import PlayerMinMaxValueOnly
 from PlayerRandom import PlayerRandom
 from PlayerTaking import PlayerTaking
 
@@ -38,10 +41,14 @@ def play_a_thousand_games(player1, player2):
                 if e.board.turn == chess.WHITE:
                     move_san = player1.move(e.board.turn, list(e.board.legal_moves))
                     e.board.push_san(move_san)
+                    print("White played", move_san)
+                    #print(e.board)
+                    #print(board_to_game(e.board))
                     moves += 1
                 else:
                     move_san = player2.move(e.board.turn, list(e.board.legal_moves))
                     e.board.push_san(move_san)
+                    #print(board_to_game(e.board))
                     moves += 1
             elif e.board.outcome().winner == chess.WHITE:
                 whiteWins += 1
@@ -64,10 +71,12 @@ def play_a_thousand_games(player1, player2):
             # display(chess.svg.board(board, size=350))
             # For Pycharm
             # print(calculate_score(board.turn))
-            # print(e.board)
-            # print("\n")
-        print(whiteWins, blackWins, remis)
-        print(moves / (whiteWins + blackWins + remis))
+            #print(e.board)
+            #print("\n")
+    print(whiteWins, remis, blackWins)
+    print(moves / (whiteWins + blackWins + remis))
 
 
-play_a_thousand_games(PlayerTaking(), PlayerTaking())
+# Error with two MinMax players
+play_a_thousand_games(PlayerMinMaxValueOnly(3), PlayerRandom())
+
