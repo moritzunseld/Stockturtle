@@ -2,7 +2,7 @@
 Self-made chess bot
 
 Current features:
-- Simulating x amount of games between different chess agents and counting their results
+- Simulating an arbitrary number of games between different chess agents and counting their results
 - 4 different agents
   - Human: A person inputs their move personally
   - Random: The agent moves completely random
