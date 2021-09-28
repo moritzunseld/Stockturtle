@@ -1,82 +1,79 @@
 import collections
-import random
-from IPython.display import display
 import chess
 import chess.svg
 import Environment as e
 import chess.pgn
 
-from PlayerHuman import PlayerHuman
-from PlayerMinMaxValueOnly import PlayerMinMaxValueOnly
+import random
+from PlayerMinMax import PlayerMinMax
 from PlayerRandom import PlayerRandom
 from PlayerTaking import PlayerTaking
 
-# from https://github.com/niklasf/python-chess/issues/63
-def board_to_game(board):
+
+# adjusted from https://github.com/niklasf/python-chess/issues/63
+def print_game():
     game = chess.pgn.Game()
 
     # Undo all moves.
     switchyard = collections.deque()
-    while board.move_stack:
-        switchyard.append(board.pop())
+    while e.board.move_stack:
+        switchyard.append(e.board.pop())
 
-    game.setup(board)
+    game.setup(e.board)
     node = game
 
     # Replay all moves.
     while switchyard:
         move = switchyard.pop()
         node = node.add_variation(move)
-        board.push(move)
+        e.board.push(move)
 
-    game.headers["Result"] = board.result()
-    return game
+    game.headers["Result"] = e.board.result()
+    print(game)
 
-def play_a_thousand_games(player1, player2):
-    whiteWins, blackWins, remis = 0, 0, 0
+
+def play_games(player1, player2, num=1000):
+    white_wins, black_wins, remis = 0, 0, 0
     moves = 0
-    for j in range(0, 1000):
+    for j in range(0, num):
         for i in range(1, 10000):
             if e.board.outcome() is None:
                 if e.board.turn == chess.WHITE:
-                    move_san = player1.move(e.board.turn, list(e.board.legal_moves))
+                    # Random first move to avoid same games vs same enemy
+                    if i == 1:
+                        move_san = str(random.choice(list(e.board.legal_moves)))
+                    else:
+                        move_san = player1.move(chess.WHITE, list(e.board.legal_moves))
                     e.board.push_san(move_san)
-                    print("White played", move_san)
-                    #print(e.board)
-                    #print(board_to_game(e.board))
+                    # print("White played ", move_san)
                     moves += 1
                 else:
-                    move_san = player2.move(e.board.turn, list(e.board.legal_moves))
+                    # Random first move to avoid same games vs same enemy
+                    if i == 2:
+                        move_san = str(random.choice(list(e.board.legal_moves)))
+
+                    else:
+                        move_san = player2.move(chess.BLACK, list(e.board.legal_moves))
                     e.board.push_san(move_san)
-                    #print(board_to_game(e.board))
+                    # print("Black played ", move_san)
                     moves += 1
             elif e.board.outcome().winner == chess.WHITE:
-                whiteWins += 1
-                # print("White won after", i, "moves")
-                print(board_to_game(e.board))
+                white_wins += 1
+                print_game()
                 e.board.reset()
                 break
             elif e.board.outcome().winner == chess.BLACK:
-                blackWins += 1
-                # print("Black won after", i, "moves")
+                black_wins += 1
+                print_game()
                 e.board.reset()
                 break
             else:
                 remis += 1
-                # print("Remis after", i, "moves")
+                print_game()
                 e.board.reset()
                 break
-
-            # For Jupyter
-            # display(chess.svg.board(board, size=350))
-            # For Pycharm
-            # print(calculate_score(board.turn))
-            #print(e.board)
-            #print("\n")
-    print(whiteWins, remis, blackWins)
-    print(moves / (whiteWins + blackWins + remis))
+        print(white_wins, remis, black_wins)
+        print(moves / (white_wins + black_wins + remis))
 
 
-# Error with two MinMax players
-play_a_thousand_games(PlayerMinMaxValueOnly(3), PlayerRandom())
-
+play_games(PlayerMinMax(3), PlayerRandom())
