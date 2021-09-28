@@ -10,27 +10,6 @@ from PlayerRandom import PlayerRandom
 from PlayerTaking import PlayerTaking
 
 
-# adjusted from https://github.com/niklasf/python-chess/issues/63
-def print_game():
-    game = chess.pgn.Game()
-
-    # Undo all moves.
-    switchyard = collections.deque()
-    while e.board.move_stack:
-        switchyard.append(e.board.pop())
-
-    game.setup(e.board)
-    node = game
-
-    # Replay all moves.
-    while switchyard:
-        move = switchyard.pop()
-        node = node.add_variation(move)
-        e.board.push(move)
-
-    game.headers["Result"] = e.board.result()
-    print(game)
-
 
 def play_games(player1, player2, num=1000):
     white_wins, black_wins, remis = 0, 0, 0
@@ -75,5 +54,27 @@ def play_games(player1, player2, num=1000):
         print(white_wins, remis, black_wins)
         print(moves / (white_wins + black_wins + remis))
 
+# adjusted from https://github.com/niklasf/python-chess/issues/63
+def print_game():
+    game = chess.pgn.Game()
 
-play_games(PlayerMinMax(3), PlayerRandom())
+    # Undo all moves.
+    switchyard = collections.deque()
+    while e.board.move_stack:
+        switchyard.append(e.board.pop())
+
+    game.setup(e.board)
+    node = game
+
+    # Replay all moves.
+    while switchyard:
+        move = switchyard.pop()
+        node = node.add_variation(move)
+        e.board.push(move)
+
+    game.headers["Result"] = e.board.result()
+    print(game)
+
+
+
+play_games(PlayerMinMax(2), PlayerRandom())
