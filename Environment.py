@@ -36,6 +36,8 @@ white_queen_square_values = white_knight_square_values
 
 
 def calculate_score(color):
+    """Calculates the material score for a color."""
+
     score = 0
     for i in range(0, 64):
         piece = board.piece_at(chess.SQUARES[i])
@@ -55,6 +57,8 @@ def calculate_score(color):
 
 
 def calculate_position(color):
+    """Calculates the material and positional advantage for a color."""
+
     score = 0
     if board.outcome() is not None and board.outcome().result() == "1/2-1/2":
         return 0

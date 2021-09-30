@@ -4,6 +4,8 @@ import Environment
 
 class PlayerTaking:
     def move(self, color, moves):
+        """Plays the move that minimizes enemy material without considering its own."""
+
         score = 0
         best_score = Environment.calculate_score(not color)
         best_move = random.choice(moves)
